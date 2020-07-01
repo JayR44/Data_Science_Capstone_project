@@ -1,0 +1,93 @@
+---
+title: "Capstone project - week 2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include = FALSE}
+library(tidyverse)
+library(tm)
+library(textclean)
+library(qdapRegex)
+library(textshape)
+library(hunspell)
+```
+
+```{r}
+source("Functions.R")
+```
+
+And so two key questions to consider here are,  
+- how frequently do certain words appear in the data set and
+- how frequently do certain pairs of words appear together?
+
+## Exploratory analysis
+
+Read in US data
+#```{r}
+con_US_twitter <- file("./DATA/final/en_US/en_US.twitter.txt", "r")
+US_twitter <- readLines(con_US_twitter)
+close.connection(con_US_twitter)
+
+con_US_blog <- file("./DATA/final/en_US/en_US.blogs.txt", "r")
+US_blog <- readLines(con_US_blog)
+close.connection(con_US_blog)
+
+con_US_news <- file("./DATA/final/en_US/en_US.news.txt", "r")
+US_news <- readLines(con_US_news)
+close.connection(con_US_news)
+#```
+
+Combine the three datasets
+```{r}
+#US_data <- c(US_twitter, US_news, US_blog)
+#saveRDS(US_data, "./DATA/US_data.RDS")
+```
+
+Read in data
+```{r}
+US_data <- readRDS("./DATA/US_data.RDS")
+```
+
+Take a sample
+```{r}
+set.seed(0)
+US_sample_1000 <- sample(US_data, 1000)
+head(US_sample_1000)
+```
+
+=============================================================================
+
+```{r}
+US_sample_1000_cleaned <- clean_text(US_sample_1000)
+```
+
+```{r}
+US_data_cleaned <- clean_text(US_data)
+saveRDS(US_data_cleaned, "./DATA/US_data_cleaned.RDS")
+```
+
+
+```{r}
+check_text(US_sample_1000_cleaned)
+```
+```{r}
+US_sample_1000_cleaned[1:500]
+```
+
+```{r}
+str_subset(US_sample_1000_cleaned, "^I" )
+```
+
+
+```{r}
+q <- str_subset(US_sample_1000_cleaned, "^[^a-z A-Z 0-9 $ -]" ); q
+#str_replace_all(q, "^#:+ ", "")
+q %>% strip()
+```
+
+
+

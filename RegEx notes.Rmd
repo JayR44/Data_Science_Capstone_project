@@ -1,0 +1,42 @@
+---
+title: "RegEx"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Start of a line: `^match this`
+
+End of a line: `match this$`
+
+`[Bb][Uu][Ss][Hh]` - either B or b, U or u, S or s etc so BUsh or BuSh etc
+
+`^[0-9][a-zA-Z]` start: number followed by any letter
+
+[^?.]$   any line that ends in anything other than ? or . "^" indicates matching characters NOT in the indicated class
+
+"." refers to any character, e.g. 9-11, 9*11, 9/11 etc
+
+`flood | fire` - match flood OR fire
+
+^([Gg]ood | [Bb]ad) - good OR bad at start of line. () can be used to make it clear what the OR refers to
+
+`George( [W]\.)? Bush` - ()? indicated expression is optional so could have "George Bush" or "George W Bush". \. escapes the "." metacharacter
+
+(.*) - any number of "." including nil
+
+(.+) - at least one "."
+
+{min,max}  min and max number of matches
+
+{m} exactly m matches
+
+{m,} at least m matches
+
+` +([a-z]+) +\1 +`: space, at least one letter, at least one space, exact same match as that between the () x 1
+
+`^s(.*)s`: the * is greedy so it matches the longest possible string that satisfies the regex
+
+`^s(.*?)s$`: make *it* less greedy by adding ?

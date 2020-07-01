@@ -1,0 +1,73 @@
+---
+title: "Capstone project - week 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+## Read in data
+
+```{r}
+con_US_twitter <- file("./DATA/final/en_US/en_US.twitter.txt", "r")
+US_twitter <- readLines(con_US_twitter)
+close(con_US_twitter)
+```
+```{r}
+NROW(US_twitter)
+```
+
+
+```{r}
+con_US_blog <- file("./DATA/final/en_US/en_US.blogs.txt", "r")
+US_blog <- readLines(con_US_blog)
+close(con_US_blog)
+```
+```{r}
+con_US_news <- file("./DATA/final/en_US/en_US.news.txt", "r")
+US_news <- readLines(con_US_news)
+close(con_US_news)
+```
+
+```{r}
+max_len <- 0
+n <- 1
+
+for (i in US_blog){
+  
+  if(nchar(US_blog[n]) > max_len){
+    
+    max_len <- nchar(US_blog[n])
+    
+  }
+  
+  n <- n + 1
+  
+}
+max_len
+```
+
+```{r}
+US_twitter %>% str_detect("love") %>% table()
+US_twitter %>% str_detect("hate") %>% table()
+```
+
+```{r}
+x <- grep("biostats", US_twitter)
+US_twitter[x]
+```
+
+```{r}
+str_subset(US_twitter, "biostats")
+```
+
+```{r}
+str_subset(US_twitter, "^A computer once beat me at chess, but it was no match for me at kickboxing$")
+```
+

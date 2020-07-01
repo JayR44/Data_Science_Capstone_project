@@ -1,0 +1,150 @@
+---
+title: "Capzone data cleaning workings"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+US_data <- readRDS("./DATA/US_data.RDS")
+```
+
+Take a sample
+```{r}
+set.seed(0)
+US_sample_1000 <- sample(US_data, 1000)
+head(US_sample_1000)
+```
+
+Split up strings with multiple sentences
+```{r}
+#US_sample_1000[c(1, 2, 4, 8, 9, 12, 17, 20, 22, 26)]
+#US_sample_1000_spsent <- split_sentence(US_sample_1000)
+#US_sample_1000_spsent[c(1, 2, 4, 8, 9, 12, 17, 20, 22, 26)]
+```
+
+Convert to lower case
+```{r}
+US_sample_1000 <- tolower(US_sample_1000)
+head(US_sample_1000_lcase)
+```
+
+Check the text for other characters that should be removed
+```{r, include = F}
+check_text(US_sample_1000_lcase)
+```
+
+Replace incomplete sentences, i.e. contain ...
+```{r}
+US_sample_1000_lcase[c(21, 24, 26, 45, 51, 64, 78, 97, 120, 121)]
+US_sample_1000_imp <- replace_incomplete(US_sample_1000_lcase, replacement = " ")
+US_sample_1000_imp[c(21, 24, 26, 45, 51, 64, 78, 97, 120, 121)]
+```
+
+Replace contractions (e.g. you're replaced with you are)
+```{r}
+US_sample_1000_imp[c(2, 4, 12, 17, 24, 31, 34, 40, 41, 48)]
+US_sample_1000_cont <- replace_contraction(US_sample_1000_imp)
+US_sample_1000_cont[c(2, 4, 12, 17, 24, 31, 34, 40, 41, 48)]
+```
+
+Replace word elongations
+```{r}
+US_sample_1000_elong <- replace_word_elongation(US_sample_1000_cont)
+head(US_sample_1000_elong)
+```
+
+Replace internet slang
+```{r}
+US_sample_1000_int <- replace_internet_slang(US_sample_1000_elong)
+head(US_sample_1000_int)
+```
+
+Remove urls and emails
+```{r}
+US_sample_1000_int[c(326,335, 925, 979)]
+US_sample_1000_url <- replace_email(replace_url(US_sample_1000_int))
+US_sample_1000_url[c(326,335, 925, 979)]
+```
+
+Remove #'s
+```{r}
+US_sample_1000_url[c(10, 15, 48, 91, 107, 114, 148, 161, 167, 172)]
+US_sample_1000_hash <- replace_hash(US_sample_1000_url)
+US_sample_1000_hash[c(10, 15, 48, 91, 107, 114, 148, 161, 167, 172)]
+```
+
+Remove non-ascii characters
+```{r}
+US_sample_1000_hash[c(1, 6, 20, 28, 30, 33, 48, 57, 59, 73)]
+US_sample_1000_ascii <- replace_non_ascii(US_sample_1000_hash)
+US_sample_1000_ascii[c(1, 6, 20, 28, 30, 33, 48, 57, 59, 73)]
+```
+
+Replace times with words
+```{r}
+#US_sample_1000_ascii[c(44, 54, 134, 474, 556, 783, 819, 861, 937)]
+#US_sample_1000_time <- replace_time(US_sample_1000_ascii)
+#US_sample_1000_time[c(44, 54, 134, 474, 556, 783, 819, 861, 937)]
+```
+
+Replace :) and ;) and <3 with blanks
+```{r}
+US_sample_1000_ascii[c(2, 33, 36, 44, 45, 67, 74, 93, 115, 116)]
+US_sample_1000_emoticon <- str_replace_all(US_sample_1000_ascii, ":\\)|;\\)", "")
+US_sample_1000_emoticon <-str_replace_all(US_sample_1000_emoticon, "<3", "")
+US_sample_1000_emoticon[c(2, 33, 36, 44, 45, 67, 74, 93, 115, 116)]
+```
+
+Strip white space
+```{r}
+US_sample_1000_ws <- stripWhitespace(US_sample_1000_emoticon)
+```
+
+Remove `\` (can't get to work)
+```{r}
+#US_sample_1000_emoticon[c(2, 33, 36, 44, 45, 67, 74, 93, 115, 116)]
+#US_sample_1000_slash <- str_replace_all(US_sample_1000_emoticon, "([\\])", "")
+#US_sample_1000_slash[c(2, 33, 36, 44, 45, 67, 74, 93, 115, 116)]
+```
+
+Look for spelling mistakes - not sure how to use this
+```{r}
+#hunspell_find(US_sample_1000_ws)
+```
+```{r}
+#hunspell_suggest(US_sample_1000_ws)
+```
+
+hunspell_find, hunspell_suggest - misspelled words
+no space after comma
+no endmark
+replace numbers?
+dates?
+html
+split sentences
+remove \
+
+
+Check `clean_text` function works
+```{r}
+x <- US_sample_1000_ws
+y <- clean_text(US_sample_1000)
+```
+```{r}
+n <- 0
+
+for (i in 1:1000){
+  
+  if(x[i] == y[i]){
+    n <- n + 1
+    
+  } else {
+    print(i)
+  }
+  
+}
+n
+```
