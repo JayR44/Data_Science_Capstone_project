@@ -15,6 +15,7 @@ clean_text <- function(text){
     replace_non_ascii() %>%
     str_replace_all(":\\)|;\\)", "") %>%
     str_replace_all("<3", "") %>%
-    str_replace_all(q, "^:+ ", "") %>%
-    stripWhitespace()
+    str_replace_all("^:+ ", "") %>%
+    stripWhitespace() %>%
+    strip()
 }

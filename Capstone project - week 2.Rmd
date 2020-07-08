@@ -7,13 +7,21 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+Sys.setenv('JAVA_HOME'="C:/Program Files/Java/jdk-14.0.1/") 
+```
+
+
 ```{r, include = FALSE}
 library(tidyverse)
 library(tm)
 library(textclean)
 library(qdapRegex)
 library(textshape)
-library(hunspell)
+#library(hunspell)
+library(ngram)
+library(RWeka)
+library(wordcloud)
 ```
 
 ```{r}
@@ -27,7 +35,7 @@ And so two key questions to consider here are,
 ## Exploratory analysis
 
 Read in US data
-#```{r}
+```{r}
 con_US_twitter <- file("./DATA/final/en_US/en_US.twitter.txt", "r")
 US_twitter <- readLines(con_US_twitter)
 close.connection(con_US_twitter)
@@ -39,7 +47,47 @@ close.connection(con_US_blog)
 con_US_news <- file("./DATA/final/en_US/en_US.news.txt", "r")
 US_news <- readLines(con_US_news)
 close.connection(con_US_news)
-#```
+```
+
+Summary information
+```{r}
+#File sizes
+fs_UStwitter <- file.size("./DATA/final/en_US/en_US.twitter.txt")/1024^2
+fs_USblog <- file.size("./DATA/final/en_US/en_US.blogs.txt")/1024^2
+fs_USnews <- file.size("./DATA/final/en_US/en_US.news.txt")/1024^2
+```
+
+```{r}
+#File sizes
+fs_UStwitter <- file.size("./DATA/final/en_US/en_US.twitter.txt")/1024^2
+fs_USblog <- file.size("./DATA/final/en_US/en_US.blogs.txt")/1024^2
+fs_USnews <- file.size("./DATA/final/en_US/en_US.news.txt")/1024^2
+```
+
+```{r}
+#Word count
+wc_UStwitter <- wordcount(US_twitter, " ")
+wc_USblog <- wordcount(US_blog, " ")
+wc_USnews <- wordcount(US_news, " ")
+```
+
+```{r}
+#Line count
+lc_UStwitter <- length(US_twitter)
+lc_USblog <- length(US_blog)
+lc_USnews <- length(US_news)
+```
+
+```{r}
+US_summary <- tibble(File_Name = c("US Twitter", "US Blogs", "US News"),
+                     File_Size = round(c(fs_UStwitter, fs_USblog, fs_USnews),2),
+                     Word_Count = c(wc_UStwitter, wc_USblog, wc_USnews),
+                     Line_Count = c(lc_UStwitter, lc_USblog, lc_USnews))
+US_summary
+```
+```{r}
+#saveRDS(US_summary, "./US_summary.RDS")
+```
 
 Combine the three datasets
 ```{r}
@@ -63,31 +111,128 @@ head(US_sample_1000)
 
 ```{r}
 US_sample_1000_cleaned <- clean_text(US_sample_1000)
+#saveRDS(US_sample_1000_cleaned, "./DATA/US_sample_1000_cleaned.RDS")
 ```
 
 ```{r}
-US_data_cleaned <- clean_text(US_data)
-saveRDS(US_data_cleaned, "./DATA/US_data_cleaned.RDS")
+#US_data_cleaned <- clean_text(US_data)
+#saveRDS(US_data_cleaned, "./DATA/US_data_cleaned.RDS")
 ```
 
 
-```{r}
+```{r include = FALSE}
 check_text(US_sample_1000_cleaned)
 ```
 ```{r}
-US_sample_1000_cleaned[1:500]
+US_sample_1000_cleaned[1:100]
+```
+
+#Create corpus
+```{r}
+US_data_cleaned <- readRDS("./DATA/US_data_cleaned.RDS")
+```
+```{r}
+US_corpus_vec <- VCorpus(VectorSource(list(US_data_cleaned)),
+                         readerControl = list(reader=readPlain, language="english"))
+```
+
+
+```{r}
+#US_corpus_vec <- VCorpus(VectorSource(list(US_sample_1000_cleaned)),
+#                         readerControl = list(reader=readPlain, language="english"))
+```
+
+## Remove profanity
+```{r}
+bad_words <- readLines("./DATA/badwords.txt")
+```
+```{r}
+US_corpus_vec <- tm_map(US_corpus_vec, removeWords, bad_words)
+US_corpus_vec <- tm_map(US_corpus_vec, removePunctuation)
 ```
 
 ```{r}
-str_subset(US_sample_1000_cleaned, "^I" )
+#saveRDS(US_corpus_vec, "./DATA/US_corpus_vec.RDS")
 ```
 
+# Ngram tokenization
 
 ```{r}
-q <- str_subset(US_sample_1000_cleaned, "^[^a-z A-Z 0-9 $ -]" ); q
-#str_replace_all(q, "^#:+ ", "")
-q %>% strip()
+US_corpus_vec <- readRDS("./DATA/US_corpus_vec.RDS")
+```
+
+Create functions that produce groups of one, two and three words
+```{r}
+unigramToken <- function(x) NGramTokenizer(x,Weka_control(min=1, max=1))
+bigramToken <- function(x) NGramTokenizer(x,Weka_control(min=2, max=2))
+trigramToken <- function(x) NGramTokenizer(x,Weka_control(min=3, max=3))
+```
+
+Output the groups of words and the number of times they appear in the corpus
+```{r}
+unigrams <- as.matrix(TermDocumentMatrix(US_corpus_vec, control = list(tokenize = unigramToken)))
+bigrams <- as.matrix(TermDocumentMatrix(US_corpus_vec, control = list(tokenize = bigramToken)))
+trigrams <- as.matrix(TermDocumentMatrix(US_corpus_vec, control = list(tokenize = trigramToken)))
+```
+
+Convert outputs to tibbles to construct some graphs
+```{r}
+unigrams_df <- tibble(word = rownames(unigrams),
+       count = unigrams[,1])
+bigrams_df <- tibble(word = rownames(bigrams),
+       count = bigrams[,1])
+trigrams_df <- tibble(word = rownames(trigrams),
+       count = trigrams[,1])
+```
+
+Sort the word combinations in descending order of frequency
+```{r}
+ordered_unigrams <- unigrams_df %>% arrange(desc(count))
+ordered_bigrams <- bigrams_df %>% arrange(desc(count))
+ordered_trigrams <- trigrams_df %>% arrange(desc(count))
+```
+
+# Exploratory data analysis
+
+## Unigrams
+
+```{r}
+ggplot(ordered_unigrams[1:10,] %>% mutate(word_desc = fct_reorder(word, desc(count))), aes(x = word_desc, y = count)) +
+  geom_bar(stat = "identity", fill = "red") +
+  ggtitle("Histogram of 10 most common unigrams") +
+  xlab("Unigrams") +
+  ylab("Frequency") 
+```
+
+***Wordcloud showing how common words are that occur more than 10 times***
+```{r}
+wordcloud(words = ordered_unigrams$word, freq = ordered_unigrams$count, min.freq = 10, colors = brewer.pal(12,"Paired"), scale = c(6,0.5))
 ```
 
 
+## Bigrams
 
+```{r}
+ggplot(ordered_bigrams[1:10,] %>% mutate(word_desc = fct_reorder(word, desc(count))), aes(x = word_desc, y = count)) +
+  geom_bar(stat = "identity", fill = "green") +
+  ggtitle("Histogram of 10 most common bigrams") +
+  xlab("Bigrams") +
+  ylab("Frequency") 
+```
+
+## Trigrams
+
+```{r}
+ggplot(ordered_trigrams[1:10,] %>% mutate(word_desc = fct_reorder(word, desc(count))), aes(x = word_desc, y = count)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  ggtitle("Histogram of 10 most common trigrams") +
+  xlab("Trigrams") +
+  ylab("Frequency") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+# Observations
+- There are several very common words such as 'the', 'and' and 'for'. These are English stopwords. Could consider if these should be excluded from the dataset.  
+
+
+# Next steps
