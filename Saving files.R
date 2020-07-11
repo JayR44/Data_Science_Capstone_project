@@ -2,6 +2,9 @@ library(tidyverse)
 library(quanteda)
 library(tm)
 library(data.table)
+library(textclean)
+library(ngram)
+library(tictoc)
 
 file1 <- readRDS("./file1.RDS")
 file2 <- readRDS("./file2.RDS")
@@ -15,14 +18,6 @@ file_1000_to_use <- df[[1]]
 saveRDS(file_1000_to_use, "./sample_1000_to_use.RDS")
 
 ##################### CREATE NGRAMS AND DATATABLE
-
-library(tidyverse)
-library(quanteda)
-library(tm)
-library(data.table)
-library(textclean)
-library(ngram)
-library(tictoc)
 
 sample_file <- readRDS("./DATA/sample_1000_to_use.RDS")
 
@@ -74,5 +69,21 @@ test <- c(toks_full_ngram4[1:10], toks_full_ngram5[1:10])
 
 toks_full_ngrams <- c()
 
+tic("produce dfm")
+doc_feat_matrix5 <- dfm(toks_full_ngram5)
+toc()
+saveRDS(doc_feat_matrix5, "./DATA/doc_feat_matrix5.RDS")
 
+ngram_freq5 <- textstat_frequency(doc_feat_matrix5) %>%
+  select(ngram = feature, freq = frequency)
+saveRDS(ngram_freq5, "./DATA/ngram_freq5.RDS")
 
+ngram_freq5 <- readRDS("./DATA/ngram_freq5.RDS")
+ngram_info5 <- ngram_freq5 %>%
+  mutate(pred = word(ngram, -1),
+         ngram_1 = str_replace(ngram, paste0(" ",pred, "$"),"")) %>%
+  select(-ngram)
+saveRDS(ngram_info5, "./DATA/ngram_info5.RDS")
+
+#ngram_table5 <- setDT(ngram_info5)
+#saveRDS(ngram_table5, "./DATA/ngram_table5.RDS")
