@@ -23,7 +23,12 @@ source("Functions.R")
 
 
 ```{r}
-input <- "on the other side"
+input <- "Welcome to my wonderful hadn't to world"
+```
+
+```{r}
+phrase_input <- input_adj(input)
+phrase_input
 ```
 
 ```{r}
@@ -38,11 +43,19 @@ phrase <- input %>%
 m <- wordcount(phrase); m
 q <- min(m, 5)
 phrase_input <- paste(word(phrase,-q:-1), collapse = " "); phrase
+phrase_input
 ```
 
 ```{r}
-predict_word(ngram_table, phrase_input)
+#ngram_table <- readRDS("./sample_100000_table.RDS")
 ```
+
+```{r}
+predict_word(ngram_table, phrase_input) #%>%
+  #filter(pred %in% c("case", "matter", "incident", "account"))
+```
+
+
 
 ```{r}
 phrase <- phrase_input

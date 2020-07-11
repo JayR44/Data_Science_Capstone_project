@@ -30,14 +30,26 @@ toks_ngram <- tokens_ngrams(toks, n = 2:5, concatenator = " ")
 #Create document feature matrix
 doc_feat_matrix <- dfm(toks_ngram)
 
+
+tic("datatables")
 #Obtain frequencies of each ngram
 ngram_freq <- textstat_frequency(doc_feat_matrix) %>%
   select(ngram = feature, freq = frequency)
 
+ngram_info_DT <- setDT(ngram_freq)
+ngram_info_DT[, pred := word(ngram, -1)] 
+ngram_info_DT[, ngram_1 := str_replace(ngram, paste0(" ",pred, "$"),"")]
+ngram_info_DT[, ngram := NULL]
+toc()
+
+tic("dataframes")
+ngram_freq <- textstat_frequency(doc_feat_matrix) %>%
+  select(ngram = feature, freq = frequency)
 ngram_info <- ngram_freq %>%
   mutate(pred = word(ngram, -1),
          ngram_1 = str_replace(ngram, paste0(" ",pred, "$"),"")) %>%
   select(-ngram)
+toc()
 
 #Convert to datatable
 ngram_table <- setDT(ngram_info)

@@ -20,6 +20,25 @@ clean_text <- function(text){
     strip()
 }
 
+input_adj <- function(input){
+  
+  #Adjust input
+  phrase <- input %>%
+    tolower() %>%
+    replace_contraction() %>%
+    str_replace_all("haven't", "have not") %>%
+    str_replace_all("hadn't", "had not") %>%
+    removePunctuation()
+  
+  m <- wordcount(phrase); m
+  q <- min(m, 5)
+  phrase_input <- paste(word(phrase,-q:-1), collapse = " "); phrase
+  
+  return(phrase_input)
+}
+
+
+
 predict_word <- function(ngram_table, phrase){
   
   #Given a sentence, the model will predict the next word
