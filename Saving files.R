@@ -1,6 +1,7 @@
 library(tidyverse)
 library(quanteda)
 library(tm)
+library(data.table)
 
 file1 <- readRDS("./file1.RDS")
 file2 <- readRDS("./file2.RDS")
@@ -21,6 +22,7 @@ library(tm)
 library(data.table)
 library(textclean)
 library(ngram)
+library(tictoc)
 
 sample_file <- readRDS("./DATA/sample_1000_to_use.RDS")
 
@@ -46,3 +48,31 @@ ngram_info <- ngram_freq %>%
 ngram_table <- setDT(ngram_info)
 
 head(ngram_table)
+###############
+
+#Split toks_full into 5:
+#- 1:1000000
+#- 1000001:2000000
+#- 2000001:2500000
+#- 2500001:3000000
+#- 3000001:length(toks_full)
+
+toks_full <- readRDS("./DATA/full tokens list.RDS")
+n <- length(toks_full)
+
+#toks_full4 <- toks_full[2500001:3000000]
+#tic("test")
+#toks_full_ngram4 <- tokens_ngrams(toks_full4, n = 2:5, concatenator = " ")
+#toc()
+#saveRDS(toks_full_ngram4, "./DATA/toks_full_ngram4.RDS")
+
+#Combine all tokens
+
+toks_full_ngram5 <- readRDS("./DATA/toks_full_ngram5.RDS")
+
+test <- c(toks_full_ngram4[1:10], toks_full_ngram5[1:10])
+
+toks_full_ngrams <- c()
+
+
+
