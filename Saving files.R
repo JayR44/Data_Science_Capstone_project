@@ -75,16 +75,31 @@ n <- length(toks_full)
 
 #Combine all tokens
 
-toks_full_ngram4 <- readRDS("./DATA/toks_full_ngram4.RDS")
+
 n <- length(toks_full_ngram4)
 
-toks_full_ngram4a <- toks_full_ngram4[1: ,]
-toks_full_ngram4b <- toks_full_ngram4[ :n,]
+toks_full_ngram4a <- toks_full_ngram4[1:250000]
+saveRDS(toks_full_ngram4a, "./toks_full_ngram4a.RDS")
+rm(toks_full_ngram4a)
+toks_full_ngram4b <- toks_full_ngram4[250001:n]
+saveRDS(toks_full_ngram4b, "./toks_full_ngram4b.RDS")
+rm(toks_full_ngram4b)
 
+toks_full_ngram4a <- readRDS("./DATA/toks_full_ngram4a.RDS")
 tic("produce dfm")
-doc_feat_matrix3 <- dfm(toks_full_ngram3)
+doc_feat_matrix4a <- dfm(toks_full_ngram4a)
 toc()
-saveRDS(doc_feat_matrix3, "./DATA/doc_feat_matrix3.RDS")
+saveRDS(doc_feat_matrix4a, "./DATA/doc_feat_matrix4a.RDS")
+rm(toks_full_ngram4a)
+rm(doc_feat_matrix4a)
+
+toks_full_ngram4b <- readRDS("./DATA/toks_full_ngram4b.RDS")
+tic("produce dfm")
+doc_feat_matrix4b <- dfm(toks_full_ngram4b)
+toc()
+saveRDS(doc_feat_matrix4b, "./DATA/doc_feat_matrix4b.RDS")
+rm(toks_full_ngram4b)
+rm(doc_feat_matrix4b)
 
 ngram_freq2 <- textstat_frequency(doc_feat_matrix2) %>%
   select(ngram = feature, freq = frequency)
