@@ -21,6 +21,7 @@ library(tm)
 library(data.table)
 library(textclean)
 library(ngram)
+library(tictoc)
 
 sample_file <- readRDS("./DATA/sample_1000_to_use.RDS")
 
@@ -60,11 +61,43 @@ ngram_freq1 <- textstat_frequency(doc_feat_matrix1) %>%
   select(ngram = feature, freq = frequency)
 saveRDS(ngram_freq1, "./DATA/ngram_freq1.RDS")
 
-ngram_freq1 <- readRDS("./DATA/ngram_freq1.RDS")
-ngram_info1 <- ngram_freq1 %>%
-  mutate(pred = word(ngram, -1),
-         ngram_1 = str_replace(ngram, paste0(" ",pred, "$"),"")) %>%
-  select(-ngram)
-saveRDS(ngram_info1, "./DATA/ngram_info1.RDS")
+ngram_freq1b <- readRDS("./ngram_freq1b.RDS")
+#ngram_info1 <- ngram_freq1 %>%
+#  mutate(pred = word(ngram, -1),
+#         ngram_1 = str_replace(ngram, paste0(" ",pred, "$"),"")) %>%
+#  select(-ngram)
+
+n <- NROW(ngram_freq1b)
+
+ngram_freq5a <- ngram_freq5[1:10000000,]
+saveRDS(ngram_freq5a, "./ngram_freq5a.RDS")
+rm(ngram_freq5a)
+ngram_freq5b <- ngram_freq5[10000001:20000000,]
+saveRDS(ngram_freq5b, "./ngram_freq5b.RDS")
+rm(ngram_freq5b)
+ngram_freq5c <- ngram_freq5[20000001:n,]
+saveRDS(ngram_freq5c, "./ngram_freq5c.RDS")
+rm(ngram_freq5)
+
+ngram_freq1c <- ngram_freq1b[7000001:n,]
+saveRDS(ngram_freq1c, "./ngram_freq1c.RDS")
+rm(ngram_freq1c)
+ngram_freq1b <- ngram_freq1b[2:7000001,]
+saveRDS(ngram_freq1b, "./ngram_freq1b.RDS")
+rm(ngram_freq1b)
+
+tic("set Dt")
+ngram_info_DT1 <- setDT(ngram_freq1)
+toc()
+tic("pred")
+ngram_info_DT1[, pred := word(ngram, -1)] 
+toc()
+tic("ngram1")
+ngram_info_DT1[, ngram_1 := str_replace(ngram, paste0(" ",pred, "$"),"")]
+toc()
+tic("remove col")
+ngram_info_DT1[, ngram := NULL]
+toc()
+saveRDS(ngram_info_DT1, "./DATA/ngram_info_DT1.RDS")
 
 

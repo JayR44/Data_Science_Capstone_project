@@ -75,20 +75,22 @@ n <- length(toks_full)
 
 #Combine all tokens
 
-toks_full_ngram5 <- readRDS("./DATA/toks_full_ngram5.RDS")
+toks_full_ngram4 <- readRDS("./DATA/toks_full_ngram4.RDS")
+n <- length(toks_full_ngram4)
 
-test <- c(toks_full_ngram4[1:10], toks_full_ngram5[1:10])
-
-toks_full_ngrams <- c()
+toks_full_ngram4a <- toks_full_ngram4[1: ,]
+toks_full_ngram4b <- toks_full_ngram4[ :n,]
 
 tic("produce dfm")
-doc_feat_matrix5 <- dfm(toks_full_ngram5)
+doc_feat_matrix3 <- dfm(toks_full_ngram3)
 toc()
-saveRDS(doc_feat_matrix5, "./DATA/doc_feat_matrix5.RDS")
+saveRDS(doc_feat_matrix3, "./DATA/doc_feat_matrix3.RDS")
 
-ngram_freq5 <- textstat_frequency(doc_feat_matrix5) %>%
+ngram_freq2 <- textstat_frequency(doc_feat_matrix2) %>%
   select(ngram = feature, freq = frequency)
-saveRDS(ngram_freq5, "./DATA/ngram_freq5.RDS")
+saveRDS(ngram_freq2, "./DATA/ngram_freq2.RDS")
+
+#split 4 in half!
 
 ngram_freq5 <- readRDS("./DATA/ngram_freq5.RDS")
 ngram_info5 <- ngram_freq5 %>%
@@ -99,3 +101,4 @@ saveRDS(ngram_info5, "./DATA/ngram_info5.RDS")
 
 #ngram_table5 <- setDT(ngram_info5)
 #saveRDS(ngram_table5, "./DATA/ngram_table5.RDS")
+
