@@ -1,0 +1,101 @@
+---
+title: "Word Prediction Model"
+date: "11/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(quanteda)
+library(tm)
+library(data.table)
+library(textclean)
+library(ngram)
+```
+
+```{r}
+source("Functions.R")
+```
+
+
+```{r}
+input <- "on the other side"
+```
+
+```{r}
+#Adjust input
+phrase <- input %>%
+  tolower() %>%
+  replace_contraction() %>%
+  str_replace_all("haven't", "have not") %>%
+  str_replace_all("hadn't", "had not") %>%
+  removePunctuation()
+
+m <- wordcount(phrase); m
+q <- min(m, 5)
+phrase_input <- paste(word(phrase,-q:-1), collapse = " "); phrase
+```
+
+```{r}
+predict_word(ngram_table, phrase_input)
+```
+
+```{r}
+phrase <- phrase_input
+
+#Obtain lines from the data table with the last few words of ngram_1 matching the phrase
+sub_lines <- ngram_table[grep(paste0(" ", phrase,"$"), ngram_1)]
+print(sub_lines)
+
+loop <- 1
+len_phrase <- wordcount(phrase); len_phrase
+
+#If there are no matches
+while(NROW(sub_lines) == 0) {
+  
+  #Remove the last word from the phrase
+  phrase <- str_replace(phrase, paste0("^", word(phrase,1), " "), "")
+  sub_lines <- ngram_table[grep(paste0(" ", phrase,"$"), ngram_1)]
+  print(phrase)
+  
+  loop <- loop + 1
+  
+  #Stop if the loop equals the length of the phrase
+  if(loop == len_phrase){
+    break
+  }
+  
+}
+
+print(sub_lines)
+
+if(NROW(sub_lines) == 0){
+  
+  stop("No prediction found")
+  
+}
+
+options <- sub_lines %>%
+  group_by(pred) %>%
+  summarise(tot_freq = sum(freq)) %>%
+  ungroup() %>%
+  arrange(desc(tot_freq))
+
+predicted_word <- options[1,1] %>% pull()
+
+print(options)
+
+```
+
+```{r}
+sub_lines <- ngram_table[grep(paste0(" ", phrase_input,"$"), ngram_1)]
+sub_lines
+sub_lines <- ngram_table[grep(paste0(" ", phrase,"$"), ngram_1)]
+sub_lines
+```
+
+
