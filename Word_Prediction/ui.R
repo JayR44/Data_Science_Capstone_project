@@ -7,8 +7,6 @@ library(shiny)
 library(tidyverse)
 library(data.table)
 
-source("../Functions.R")
-
 # Define UI for application that predicts the next word of a phrase
 shinyUI(fluidPage(
 
@@ -26,7 +24,7 @@ shinyUI(fluidPage(
         mainPanel(
            #plotOutput("distPlot"),
            # h3(textOutput("predicted_word"))
-            textOutput("phrase")
+            textOutput("phrase"),
             dataTableOutput("word_options")
         )
     )
