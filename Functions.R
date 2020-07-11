@@ -53,7 +53,7 @@ predict_word <- function(ngram_table, phrase){
   }
   
   options <- sub_lines %>%
-    group_by(pred) %>%   #group_by(pred) %>%    whould show most common next world but not necessarily specific to the phrase
+    group_by(pred) %>%   #group_by(pred, ngram_1) %>%    whould show most common next world but not necessarily specific to the phrase
     summarise(tot_freq = sum(freq)) %>%
     ungroup() %>%
     arrange(desc(tot_freq))
