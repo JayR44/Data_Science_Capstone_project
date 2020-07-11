@@ -61,20 +61,20 @@ ngram_freq1 <- textstat_frequency(doc_feat_matrix1) %>%
   select(ngram = feature, freq = frequency)
 saveRDS(ngram_freq1, "./DATA/ngram_freq1.RDS")
 
-ngram_freq1b <- readRDS("./ngram_freq1b.RDS")
+ngram_freq3 <- readRDS("./DATA/ngram_freq3.RDS")
 #ngram_info1 <- ngram_freq1 %>%
 #  mutate(pred = word(ngram, -1),
 #         ngram_1 = str_replace(ngram, paste0(" ",pred, "$"),"")) %>%
 #  select(-ngram)
 
-n <- NROW(ngram_freq1b)
+n <- NROW(ngram_freq3)
 
-ngram_freq5a <- ngram_freq5[1:10000000,]
-saveRDS(ngram_freq5a, "./ngram_freq5a.RDS")
-rm(ngram_freq5a)
-ngram_freq5b <- ngram_freq5[10000001:20000000,]
-saveRDS(ngram_freq5b, "./ngram_freq5b.RDS")
-rm(ngram_freq5b)
+ngram_freq3a <- ngram_freq3[1:12000000,]
+saveRDS(ngram_freq3a, "./ngram_freq3a.RDS")
+rm(ngram_freq3a)
+ngram_freq3b <- ngram_freq3[12000001:n,]
+saveRDS(ngram_freq3b, "./ngram_freq3b.RDS")
+rm(ngram_freq3b)
 ngram_freq5c <- ngram_freq5[20000001:n,]
 saveRDS(ngram_freq5c, "./ngram_freq5c.RDS")
 rm(ngram_freq5)

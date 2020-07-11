@@ -105,9 +105,18 @@ ngram_freq2 <- textstat_frequency(doc_feat_matrix2) %>%
   select(ngram = feature, freq = frequency)
 saveRDS(ngram_freq2, "./DATA/ngram_freq2.RDS")
 
-#split 4 in half!
 
-ngram_freq5 <- readRDS("./DATA/ngram_freq5.RDS")
+
+ngram_freq2 <- readRDS("./DATA/ngram_freq2.RDS")
+n <- NROW(ngram_freq2)
+
+ngram_freq2a <- ngram_freq2[1:12000000,]
+saveRDS(ngram_freq2a, "./ngram_freq2a.RDS")
+rm(ngram_freq2a)
+ngram_freq2b <- ngram_freq2[12000001:n,]
+saveRDS(ngram_freq2b, "./ngram_freq2b.RDS")
+rm(ngram_freq2b)
+
 ngram_info5 <- ngram_freq5 %>%
   mutate(pred = word(ngram, -1),
          ngram_1 = str_replace(ngram, paste0(" ",pred, "$"),"")) %>%
