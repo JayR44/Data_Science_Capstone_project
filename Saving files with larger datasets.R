@@ -100,4 +100,8 @@ ngram_info_DT1[, ngram := NULL]
 toc()
 saveRDS(ngram_info_DT1, "./DATA/ngram_info_DT1.RDS")
 
-
+doc_feat_matrix3 <- readRDS("./DATA/doc_feat_matrix3.RDS")
+ngram_freq3 <- textstat_frequency(doc_feat_matrix3) %>%
+  select(ngram = feature, freq = frequency)
+saveRDS(ngram_freq3, "./ngram_freq3.RDS")
+rm(ngram_freq3)
