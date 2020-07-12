@@ -101,28 +101,51 @@ saveRDS(doc_feat_matrix4b, "./DATA/doc_feat_matrix4b.RDS")
 rm(toks_full_ngram4b)
 rm(doc_feat_matrix4b)
 
-ngram_freq2 <- textstat_frequency(doc_feat_matrix2) %>%
+doc_feat_matrix4a <- readRDS("./DATA/doc_feat_matrix4a.RDS")
+ngram_freq4a <- textstat_frequency(doc_feat_matrix4a) %>%
   select(ngram = feature, freq = frequency)
-saveRDS(ngram_freq2, "./DATA/ngram_freq2.RDS")
+saveRDS(ngram_freq4a, "./DATA/ngram_freq4a.RDS")
+rm(doc_feat_matrix4a)
+rm(ngram_freq4a)
+
+doc_feat_matrix4b <- readRDS("./DATA/doc_feat_matrix4b.RDS")
+ngram_freq4b <- textstat_frequency(doc_feat_matrix4b) %>%
+  select(ngram = feature, freq = frequency)
+saveRDS(ngram_freq4b, "./DATA/ngram_freq4b.RDS")
+rm(doc_feat_matrix4b)
+rm(ngram_freq4b)
 
 
+ngram_freq4a <- readRDS("./DATA/ngram_freq4a.RDS")
+n <- NROW(ngram_freq4a)
 
-ngram_freq2 <- readRDS("./DATA/ngram_freq2.RDS")
-n <- NROW(ngram_freq2)
+ngram_freq4ai <- ngram_freq4a[1:9000000,]
+saveRDS(ngram_freq4ai, "./ngram_freq4ai.RDS")
+rm(ngram_freq4ai)
+ngram_freq4bi <- ngram_freq4b[1:9000000,]
+saveRDS(ngram_freq4bi, "./ngram_freq4bi.RDS")
+rm(ngram_freq4bi)
 
-ngram_freq2a <- ngram_freq2[1:12000000,]
-saveRDS(ngram_freq2a, "./ngram_freq2a.RDS")
-rm(ngram_freq2a)
-ngram_freq2b <- ngram_freq2[12000001:n,]
-saveRDS(ngram_freq2b, "./ngram_freq2b.RDS")
-rm(ngram_freq2b)
+ngram_freq4aii <- ngram_freq4a[9000001:18000000,]
+saveRDS(ngram_freq4aii, "./ngram_freq4aii.RDS")
+rm(ngram_freq4aii)
 
-ngram_info5 <- ngram_freq5 %>%
-  mutate(pred = word(ngram, -1),
-         ngram_1 = str_replace(ngram, paste0(" ",pred, "$"),"")) %>%
-  select(-ngram)
-saveRDS(ngram_info5, "./DATA/ngram_info5.RDS")
+ngram_freq4aiii <- ngram_freq4a[18000001:n,]
+saveRDS(ngram_freq4aiii, "./ngram_freq4aiii.RDS")
+rm(ngram_freq4aiii)
 
-#ngram_table5 <- setDT(ngram_info5)
-#saveRDS(ngram_table5, "./DATA/ngram_table5.RDS")
 
+#ngram_freq4b <- readRDS("./DATA/ngram_freq4b.RDS")
+m <- NROW(ngram_freq4b)
+
+ngram_freq4bi <- ngram_freq4b[1:9000000,]
+saveRDS(ngram_freq4bi, "./ngram_freq4bi.RDS")
+rm(ngram_freq4bi)
+
+ngram_freq4bii <- ngram_freq4b[9000001:18000000,]
+saveRDS(ngram_freq4bii, "./ngram_freq4bii.RDS")
+rm(ngram_freq4bii)
+
+ngram_freq4biii <- ngram_freq4b[18000001:m,]
+saveRDS(ngram_freq4biii, "./ngram_freq4biii.RDS")
+rm(ngram_freq4biii)

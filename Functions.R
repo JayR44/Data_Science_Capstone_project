@@ -20,6 +20,44 @@ clean_text <- function(text){
     strip()
 }
 
+create_data_table <- function(data, string){
+  
+  n <- NROW(data)
+  data1 <- data[1:signif(n/2),]
+  data2 <- data[signif(n/2) + 1: n,]
+  
+  tic("DT")
+  ngram_info_DT1 <- setDT(data1)
+  print(toc())
+  tic("pred")
+  ngram_info_DT1[, pred := word(ngram, -1)] 
+  print(toc())
+  tic("ngram1")
+  ngram_info_DT1[, ngram_1 := str_replace(ngram, paste0(" ",pred, "$"),"")]
+  print(toc())
+  tic("rm")
+  ngram_info_DT1[, ngram := NULL]
+  print(toc())
+  saveRDS(ngram_info_DT1, paste0("./datatables/",string,"1.RDS"))
+  rm(ngram_info_DT1)
+  
+  tic("DT")
+  ngram_info_DT1 <- setDT(data2)
+  print(toc())
+  tic("pred")
+  ngram_info_DT1[, pred := word(ngram, -1)] 
+  print(toc())
+  tic("ngram1")
+  ngram_info_DT1[, ngram_1 := str_replace(ngram, paste0(" ",pred, "$"),"")]
+  print(toc())
+  tic("rm")
+  ngram_info_DT1[, ngram := NULL]
+  print(toc())
+  saveRDS(ngram_info_DT1, paste0("./datatables/",string,"2.RDS"))
+  rm(ngram_info_DT1)
+  
+}
+
 input_adj <- function(input){
   
   #Adjust input

@@ -51,43 +51,9 @@ head(ngram_table)
 
 ###############################
 
-toks_full_ngram1 <- readRDS("./DATA/toks_full_ngram1.RDS")
-tic("produce dfm")
-doc_feat_matrix1 <- dfm(toks_full_ngram1)
-toc()
-saveRDS(doc_feat_matrix1, "./DATA/doc_feat_matrix1.RDS")
-
-ngram_freq1 <- textstat_frequency(doc_feat_matrix1) %>%
-  select(ngram = feature, freq = frequency)
-saveRDS(ngram_freq1, "./DATA/ngram_freq1.RDS")
-
-ngram_freq3 <- readRDS("./DATA/ngram_freq3.RDS")
-#ngram_info1 <- ngram_freq1 %>%
-#  mutate(pred = word(ngram, -1),
-#         ngram_1 = str_replace(ngram, paste0(" ",pred, "$"),"")) %>%
-#  select(-ngram)
-
-n <- NROW(ngram_freq3)
-
-ngram_freq3a <- ngram_freq3[1:12000000,]
-saveRDS(ngram_freq3a, "./ngram_freq3a.RDS")
-rm(ngram_freq3a)
-ngram_freq3b <- ngram_freq3[12000001:n,]
-saveRDS(ngram_freq3b, "./ngram_freq3b.RDS")
-rm(ngram_freq3b)
-ngram_freq5c <- ngram_freq5[20000001:n,]
-saveRDS(ngram_freq5c, "./ngram_freq5c.RDS")
-rm(ngram_freq5)
-
-ngram_freq1c <- ngram_freq1b[7000001:n,]
-saveRDS(ngram_freq1c, "./ngram_freq1c.RDS")
-rm(ngram_freq1c)
-ngram_freq1b <- ngram_freq1b[2:7000001,]
-saveRDS(ngram_freq1b, "./ngram_freq1b.RDS")
-rm(ngram_freq1b)
-
+ngram_freq3bi <- readRDS("./ngram_freq3bi.RDS")
 tic("set Dt")
-ngram_info_DT1 <- setDT(ngram_freq1)
+ngram_info_DT1 <- setDT(ngram_freq3bi)
 toc()
 tic("pred")
 ngram_info_DT1[, pred := word(ngram, -1)] 
@@ -98,10 +64,44 @@ toc()
 tic("remove col")
 ngram_info_DT1[, ngram := NULL]
 toc()
-saveRDS(ngram_info_DT1, "./DATA/ngram_info_DT1.RDS")
+saveRDS(ngram_info_DT1, "./DATA/ngram_info_DT_3bi.RDS")
+rm(ngram_info_DT1)
+rm(ngram_freq3bi)
 
-doc_feat_matrix3 <- readRDS("./DATA/doc_feat_matrix3.RDS")
-ngram_freq3 <- textstat_frequency(doc_feat_matrix3) %>%
-  select(ngram = feature, freq = frequency)
-saveRDS(ngram_freq3, "./ngram_freq3.RDS")
-rm(ngram_freq3)
+##STILL NEED TO DO RUNS FOR 4a AND 4b!!!!
+
+ngram_freq3a <- readRDS("./ngram_freq3a.RDS")
+create_data_table(ngram_freq3a, "ngram_freq3a")
+rm(ngram_freq3a)
+
+ngram_freq1a <- readRDS("./ngram_freq1a.RDS")
+create_data_table(ngram_freq1a, "ngram_freq1a")
+rm(ngram_freq1a)
+
+ngram_freq1b <- readRDS("./ngram_freq1b.RDS")
+create_data_table(ngram_freq1b, "ngram_freq1b")
+rm(ngram_freq1b)
+
+ngram_freq1c <- readRDS("./ngram_freq1c.RDS")
+create_data_table(ngram_freq1c, "ngram_freq1c")
+rm(ngram_freq1c)
+
+ngram_freq2a <- readRDS("./ngram_freq2a.RDS")
+create_data_table(ngram_freq2a, "ngram_freq2a")
+rm(ngram_freq2a)
+
+ngram_freq2b <- readRDS("./ngram_freq2b.RDS")
+create_data_table(ngram_freq2b, "ngram_freq2b")
+rm(ngram_freq2b)
+
+ngram_freq5a <- readRDS("./ngram_freq5a.RDS")
+create_data_table(ngram_freq5a, "ngram_freq5a")
+rm(ngram_freq5a)
+
+ngram_freq5b <- readRDS("./ngram_freq5b.RDS")
+create_data_table(ngram_freq5b, "ngram_freq5b")
+rm(ngram_freq5b)
+
+ngram_freq5c <- readRDS("./ngram_freq5c.RDS")
+create_data_table(ngram_freq5c, "ngram_freq5c")
+rm(ngram_freq5c)
