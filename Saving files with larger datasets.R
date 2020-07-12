@@ -70,29 +70,29 @@ rm(ngram_freq3bi)
 
 ##STILL NEED TO DO RUNS FOR 4a AND 4b!!!!
 
-ngram_freq3a <- readRDS("./ngram_freq3a.RDS")
-create_data_table(ngram_freq3a, "ngram_freq3a")
-rm(ngram_freq3a)
+ngram_freq4ai <- readRDS("./ngram_freq4ai.RDS")
+create_data_table(ngram_freq4ai, "ngram_freq4ai")
+rm(ngram_freq4ai)
 
-ngram_freq1a <- readRDS("./ngram_freq1a.RDS")
-create_data_table(ngram_freq1a, "ngram_freq1a")
-rm(ngram_freq1a)
+ngram_freq4aii <- readRDS("./ngram_freq4aii.RDS")
+create_data_table(ngram_freq4aii, "ngram_freq4aii")
+rm(ngram_freq4aii)
 
-ngram_freq1b <- readRDS("./ngram_freq1b.RDS")
-create_data_table(ngram_freq1b, "ngram_freq1b")
-rm(ngram_freq1b)
+ngram_freq4aiii <- readRDS("./ngram_freq4aiii.RDS")
+create_data_table(ngram_freq4aiii, "ngram_freq4aiii")
+rm(ngram_freq4aiii)
 
-ngram_freq1c <- readRDS("./ngram_freq1c.RDS")
-create_data_table(ngram_freq1c, "ngram_freq1c")
-rm(ngram_freq1c)
+ngram_freq4bi <- readRDS("./ngram_freq4bi.RDS")
+create_data_table(ngram_freq4bi, "ngram_freq4bi")
+rm(ngram_freq4bi)
 
-ngram_freq2a <- readRDS("./ngram_freq2a.RDS")
-create_data_table(ngram_freq2a, "ngram_freq2a")
-rm(ngram_freq2a)
+ngram_freq4bii <- readRDS("./ngram_freq4bii.RDS")
+create_data_table(ngram_freq4bii, "ngram_freq4bii")
+rm(ngram_freq4bii)
 
-ngram_freq2b <- readRDS("./ngram_freq2b.RDS")
-create_data_table(ngram_freq2b, "ngram_freq2b")
-rm(ngram_freq2b)
+ngram_freq4biii <- readRDS("./ngram_freq4biii.RDS")
+create_data_table(ngram_freq4biii, "ngram_freq4biii")
+rm(ngram_freq4biii)
 
 ngram_freq5a <- readRDS("./ngram_freq5a.RDS")
 create_data_table(ngram_freq5a, "ngram_freq5a")
