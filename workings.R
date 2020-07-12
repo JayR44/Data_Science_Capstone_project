@@ -25,22 +25,52 @@ library(textclean)
 library(ngram)
 library(tictoc)
 
-ngram_freq1a_DT <- readRDS("./datatables/ngram_freq1a1.RDS")
-n <- NROW(ngram_freq1a_DT)
+dt_list <- readRDS("./datatables/dt_list4.RDS")
 
-ngram_freq1a_DT %>%
-  group_by(pred, ngram_1) %>%
-  count()
+tic("dt bind")
+datatables <- rbindlist(dt_list)
+n_comb <- NROW(datatables); n_comb
+toc()
+tic("group")
+datatables_sub <- datatables[, .(freq = sum(freq)), by = list(pred, ngram_1)]
+ngroup <- NROW(datatables_sub); ngroup
+toc()
 
-ngram_freq1a_DT_t1 <- ngram_freq1a_DT[1:5,]
-ngram_freq1a_DT_t2 <-ngram_freq1a_DT[1:5,]
-ngram_freq1a_DT_t2 <- ngram_freq1a_DT_t2[freq := freq + 1]
+saveRDS(datatables_sub, "./datatables/datatables_sub4.RDS")
+rm(datatables_sub)
+rm(datatables)
+rm(dt_list)
 
-z <- merge(ngram_freq1a_DT_t1, ngram_freq1a_DT_t2, all = T)
-z <- bind_rows(ngram_freq1a_DT_t1, ngram_freq1a_DT_t2)
+dt_list <- readRDS("./datatables/dt_list3.RDS")
 
-q <- z[, .(freq = sum(freq)), by = list(pred, ngram_1)] ; q
+tic("dt bind")
+datatables <- rbindlist(dt_list)
+n_comb <- NROW(datatables); n_comb
+toc()
+tic("group")
+datatables_sub <- datatables[, .(freq = sum(freq)), by = list(pred, ngram_1)]
+ngroup <- NROW(datatables_sub); ngroup
+toc()
 
-myfiles <- list.files("./datatables/", pattern = "*RDS")
-subfiles1 <- myfiles[str_detect(myfiles, "freq1")]
-l <- list()
+saveRDS(datatables_sub, "./datatables/datatables_sub3.RDS")
+rm(datatables_sub)
+rm(datatables)
+rm(dt_list)
+
+dt_list <- readRDS("./datatables/dt_list5.RDS")
+
+tic("dt bind")
+datatables <- rbindlist(dt_list)
+n_comb <- NROW(datatables); n_comb
+toc()
+tic("group")
+datatables_sub <- datatables[, .(freq = sum(freq)), by = list(pred, ngram_1)]
+ngroup <- NROW(datatables_sub); ngroup
+toc()
+
+saveRDS(datatables_sub, "./datatables/datatables_sub5.RDS")
+rm(datatables_sub)
+rm(datatables)
+rm(dt_list)
+
+datatables_sub5 <- readRDS("./datatables/datatables_sub5.RDS")

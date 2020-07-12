@@ -2,22 +2,17 @@
 library(shiny)
 library(shinycssloaders)
 library(tidyverse)
-library(data.table)
 
 
 source("./Functions.R")
 
-ngram_table <- NULL
-
-#ngram_table <- data.table::fread("data\\datatables_min4.csv")
-#ngram_table <- readRDS("data\\datatables_min4.RDS")
 
 # Define server logic required
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
     
-    if(is.null(ngram_table)){
+    if(is.null(table_3)){
         
-        ngram_table <- data.table::fread("data\\datatables_min4.csv")
+        read_tables(session, table_1, table_2, table_3, table_4)
     }
 
     words <- reactive({
@@ -29,8 +24,8 @@ shinyServer(function(input, output) {
     
     freqs <- reactive({
         
-        #Produce table of possible predictions
-        predict_word(ngram_table, words())
+        #Predict word
+        predict_word(table_1, table_2, table_3, table_4, words())
         
     })
     
@@ -39,23 +34,12 @@ shinyServer(function(input, output) {
         paste(input$txt, "...")
     })
     
-    output$word_options <- renderDataTable({
-
-        freqs()
-        
-    })
-    
-    output$table <- renderDataTable({
-        
-        "~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        
-    })
     
     output$predicted_word <- renderText({
         
-        #Select word with highest frequency
-        pred_word <- freqs()
-        paste("...",pred_word[1,1] %>% pull())
+        #Obtain prediction
+
+        freqs()
         
     })
 

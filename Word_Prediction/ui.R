@@ -20,11 +20,9 @@ shinyUI(fluidPage(
         mainPanel(
             h3(textOutput("phrase")),
             br(),
-            h2(em(textOutput("predicted_word") %>% withSpinner())),
+            h2(em(textOutput("predicted_word") %>% withSpinner(type = 4))),
             hr(),
-            br(),
-            dataTableOutput("table") %>%
-                withSpinner(type = 4, color = "#0275D8"),
+            br()
         )
     )
 ))

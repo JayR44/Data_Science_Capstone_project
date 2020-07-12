@@ -15,19 +15,19 @@ library(tm)
 library(data.table)
 library(textclean)
 library(ngram)
+library(tictoc)
+library(hash)
 ```
 
 ```{r}
-source("Functions.R")
+source("./Word_Prediction/Functions.R")
 ```
 
 
 ```{r}
-input <- "what a wonderful world it"
+input <- "now another way to"
 ```
-```{r}
-str_count(input, " ")
-```
+
 
 ```{r}
 phrase_input <- input_adj(input)
@@ -51,11 +51,86 @@ phrase_input
 
 ```{r}
 #ngram_table <- readRDS("./sample_100000_table.RDS")
+# nrows = 81802659
+tic("csv")
+#ngram_table <- data.table::fread("./Word_Prediction/data/datatables_min.csv")  #, header = T,colClasses = c("character","character", "numeric"))
+toc()
+
+#tic("rds")
+#ngram_table <- readRDS("./Word_Prediction/data/datatables_min.RDS")
+#toc()
 ```
 
 ```{r}
-x <- predict_word(ngram_table, phrase_input)
+tic("min4")
+datatables_min4 <- readRDS("./Word_Prediction/data/datatables_min4.RDS")
+toc()
+```
+```{r}
+table <- table_2
+table1 <- table[1:500]
+table2 <- table[600:800]
+table3 <- table[1000:1500]
+table4 <- table[5000:5400]
+```
+
+
+
+```{r}
+input <- "who let us know that their either have"
+str_count(input, " ")
+```
+
+
+```{r}
+phrase_input <- input_adj(input)
+phrase_input
+```
+
+```{r}
+x <- predict_word(table1, table2, table3, table4, phrase_input)
 x
+```
+
+
+```{r}
+gc()
+tic("test")
+table <- sub_table
+phrase <- phrase_input
+print(phrase)
+
+#setkey(table, ngram_1)
+
+#ind <- table[phrase, nomatch = 0]
+ind <- table[grep(paste0("^",phrase,"$"), ngram_1)]
+while(NROW(ind) == 0){
+ 
+ phrase <- str_replace(phrase, paste0("^", word(phrase,1), " "), "")
+ print(phrase)
+ ind <- table[grep(paste0("^",phrase,"$"), ngram_1)]
+ 
+}
+print(ind)
+pred_word <- ind$pred; pred_word
+toc()
+```
+
+
+```{r}
+u <- ngram_table[1:10]
+u
+```
+
+```{r}
+
+#df <- as.data.frame(u)
+#hash(u)
+```
+
+
+```{r}
+
 ```
 
 ```{r}

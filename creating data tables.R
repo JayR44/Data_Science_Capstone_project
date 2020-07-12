@@ -27,3 +27,27 @@ ngram_info <- ngram_freq %>%
 #Convert to datatable
 ngram_table <- setDT(ngram_info)
 saveRDS(ngram_table, "./sample_100000_table.RDS")
+
+#############################
+
+library(data.table)
+library(tidyverse)
+library(tictoc)
+
+tic("1")
+table_1 <<- readRDS("./Word_Prediction/data/datatables_min3.RDS")
+toc()
+tic("2")
+table_2 <<- readRDS("./Word_Prediction/data/datatables_min5.RDS")
+toc()
+tic("3")
+table_3 <<- readRDS("./Word_Prediction/data/datatables_min7.RDS")
+toc()
+
+tic("list")
+l <- list(table_1, table_2, table_3)
+toc()
+
+tic("comb")
+ngram_dt <- rbindlist(l)
+toc()

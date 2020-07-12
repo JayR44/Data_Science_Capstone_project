@@ -1,64 +1,6 @@
 library(textclean)
 library(tm)
-
-clean_text <- function(text){
-  
-  text %>%
-    tolower() %>%
-    replace_incomplete(replacement = " ") %>%
-    replace_contraction() %>%
-    str_replace_all("haven't", "have not") %>%
-    str_replace_all("hadn't", "had not") %>%
-    replace_word_elongation() %>%
-    replace_internet_slang() %>%
-    replace_url() %>%
-    replace_email() %>%
-    replace_hash() %>%
-    replace_non_ascii() %>%
-    str_replace_all(":\\)|;\\)", "") %>%
-    str_replace_all("<3", "") %>%
-    str_replace_all("^:+ ", "") %>%
-    stripWhitespace() %>%
-    strip()
-}
-
-create_data_table <- function(data, string){
-  
-  n <- NROW(data)
-  data1 <- data[1:signif(n/2),]
-  data2 <- data[signif(n/2) + 1: n,]
-  
-  tic("DT")
-  ngram_info_DT1 <- setDT(data1)
-  print(toc())
-  tic("pred")
-  ngram_info_DT1[, pred := word(ngram, -1)] 
-  print(toc())
-  tic("ngram1")
-  ngram_info_DT1[, ngram_1 := str_replace(ngram, paste0(" ",pred, "$"),"")]
-  print(toc())
-  tic("rm")
-  ngram_info_DT1[, ngram := NULL]
-  print(toc())
-  saveRDS(ngram_info_DT1, paste0("./datatables/",string,"1.RDS"))
-  rm(ngram_info_DT1)
-  
-  tic("DT")
-  ngram_info_DT1 <- setDT(data2)
-  print(toc())
-  tic("pred")
-  ngram_info_DT1[, pred := word(ngram, -1)] 
-  print(toc())
-  tic("ngram1")
-  ngram_info_DT1[, ngram_1 := str_replace(ngram, paste0(" ",pred, "$"),"")]
-  print(toc())
-  tic("rm")
-  ngram_info_DT1[, ngram := NULL]
-  print(toc())
-  saveRDS(ngram_info_DT1, paste0("./datatables/",string,"2.RDS"))
-  rm(ngram_info_DT1)
-  
-}
+library(data.table)
 
 input_adj <- function(input){
   
@@ -70,56 +12,104 @@ input_adj <- function(input){
     str_replace_all("hadn't", "had not") %>%
     removePunctuation()
   
-  m <- str_count(phrase, " "); m
+  m <- str_count(phrase, " ") + 1; m
   q <- min(m, 5)
   phrase_input <- paste(word(phrase,-q:-1), collapse = " "); phrase
   
   return(phrase_input)
 }
 
-
-
-predict_word <- function(ngram_table, phrase){
+predict_word <- function(table1, table2, table3, table4, phrase){
   
-  #Given a sentence, the model will predict the next word
+  ind4 <- table4[grep(paste0(" ",phrase,"$"), ngram_1)]
+  ind3 <- table3[grep(paste0(" ",phrase,"$"), ngram_1)]
+  ind2 <- table2[grep(paste0(" ",phrase,"$"), ngram_1)]
+  ind1 <- table1[grep(paste0(" ",phrase,"$"), ngram_1)]
   
-  #Obtain lines from the data table with the last few words of ngram_1 matching the phrase
-  sub_lines <- ngram_table[grep(paste0(" ", phrase,"$"), ngram_1)]
   
   loop <- 1
-  len_phrase <- str_count(phrase, " ");
+  len_phrase <- str_count(phrase, " ") + 1;
+  print(len_phrase)
   
-  #If there are no matches
-  while(NROW(sub_lines) == 0) {
+  while(NROW(ind1) + NROW(ind2) + NROW(ind3) + NROW(ind4) == 0 ){
     
-    #Remove the last word from the phrase
     phrase <- str_replace(phrase, paste0("^", word(phrase,1), " "), "")
-    sub_lines <- ngram_table[grep(paste0(" ", phrase,"$"), ngram_1)]
+    print(phrase)
+    
+    ind4 <- table4[grep(paste0(" ",phrase,"$"), ngram_1)]
+    ind3 <- table3[grep(paste0(" ",phrase,"$"), ngram_1)]
+    ind2 <- table2[grep(paste0(" ",phrase,"$"), ngram_1)]
+    ind1 <- table1[grep(paste0(" ",phrase,"$"), ngram_1)]
     
     loop <- loop + 1
     
-    #Stop if the loop equals the length of the phrase
     if(loop == len_phrase){
+      
       break
+      
     }
     
   }
   
-  if(NROW(sub_lines) == 0){
+  if(NROW(ind1) + NROW(ind2) + NROW(ind3) + NROW(ind4) == 0){
     
-      options <- data.table(pred = "the",
-                            tot_freq = 1)
+    pred_word <- "the"
     
   } else {
   
-    options <- sub_lines %>%
-       group_by(pred) %>%   #group_by(pred, ngram_1) %>%    whould show most common next world but not necessarily specific to the phrase
-       summarise(tot_freq = sum(freq)) %>%
-       ungroup() %>%
-        arrange(desc(tot_freq))
+     if(NROW(ind4) > 0){
+         options <- ind4 
   
+     } else if (NROW(ind3) > 0){
+         options <- ind3 
+         
+     } else if (NROW(ind2) > 0){
+         options <- ind2
+       
+     } else {
+         options <- ind1 
+    
+     }
+    
+    options <- options[, . (freq = sum(freq)), by = pred]
+    options <- options[order(-freq)]
+    
+    #pred_word <- options
+    pred_word <- options[1,1] %>% pull()
+       
   }
   
-  return(options)    #return(predicted_word)
+  print(ind1)
+  print(ind2)
+  print(ind3)
+  print(ind4)
+  
+  return(pred_word)
+  
+}
+
+table_1 <- NULL
+table_2 <- NULL
+table_3 <- NULL
+table_4 <- NULL
+
+read_tables <- function(session, table_1, table_2, table_3, table_4){
+  
+  progress <- Progress$new(session)
+  progress$set(value = 0, message = "Loading data")
+  
+  table_1 <<- readRDS(".\\data\\datatables_min1.RDS")
+  progress$set(value = 0.3, message = "Still loading data")
+  
+  table_2 <<- readRDS(".\\data\\datatables_min2.RDS")
+  progress$set(value = 0.6, message = "Still loading data. Thanks for waiting!")
+  
+  table_3 <<- readRDS(".\\data\\datatables_min3.RDS")
+  progress$set(value = 0.9, message = "Still loading data. Nearly there!")
+  
+  table_4 <<- readRDS(".\\data\\datatables_min4.RDS")
+  progress$set(value = 1, message = "Not long to go now!")
+  
+  progress$close
   
 }
