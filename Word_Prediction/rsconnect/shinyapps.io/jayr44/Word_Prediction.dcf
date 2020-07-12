@@ -1,0 +1,12 @@
+name: Word_Prediction
+title: Word_Prediction
+username:
+account: jayr44
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2563501
+bundleId: 3383661
+url: https://jayr44.shinyapps.io/Word_Prediction/
+when: 1594592173.94256
+asMultiple: FALSE
+asStatic: FALSE
