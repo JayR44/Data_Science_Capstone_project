@@ -1,11 +1,7 @@
 
-# shrink data.table to be unique n-grams
-# add graph showing top 5 most likely suggestions + freqs
-#
-
 library(shiny)
+library(shinycssloaders)
 library(tidyverse)
-library(data.table)
 
 # Define UI for application that predicts the next word of a phrase
 shinyUI(fluidPage(
@@ -16,16 +12,19 @@ shinyUI(fluidPage(
     # Sidebar with phrase input
     sidebarLayout(
         sidebarPanel(
-            textInput("txt", 'Input words', value = "Enter words"),
+            textInput("txt", 'Enter words', value = "Input here"),
             submitButton("Predict next word")
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           #plotOutput("distPlot"),
-           # h3(textOutput("predicted_word"))
-            textOutput("phrase"),
-            dataTableOutput("word_options")
+            h3(textOutput("phrase")),
+            br(),
+            h2(em(textOutput("predicted_word") %>% withSpinner())),
+            hr(),
+            br(),
+            dataTableOutput("table") %>%
+                withSpinner(type = 4, color = "#0275D8"),
         )
     )
 ))

@@ -1,3 +1,5 @@
+library(textclean)
+library(tm)
 
 clean_text <- function(text){
   

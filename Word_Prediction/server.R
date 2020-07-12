@@ -1,38 +1,62 @@
 
 library(shiny)
+library(shinycssloaders)
+library(tidyverse)
 library(data.table)
-library(tm)
-library(textclean)
 
-source("../Functions.R")
-ngram_table <- readRDS("data\\sample_100000_table.RDS")
+
+source("./Functions.R")
+
+ngram_table <- NULL
+
+#ngram_table <- data.table::fread("data\\datatables_min4.csv")
+#ngram_table <- readRDS("data\\datatables_min4.RDS")
 
 # Define server logic required
 shinyServer(function(input, output) {
+    
+    if(is.null(ngram_table)){
+        
+        ngram_table <- data.table::fread("data\\datatables_min4.csv")
+    }
 
-    f <- reactive({
+    words <- reactive({
         
         #Adjust input
         phrase_input <- input_adj(input$txt)
         
     })
     
-    output$word_options <- renderDataTable({
+    freqs <- reactive({
         
-        #Import data table - need to solve this!
-       # ngram_table <- readRDS("../sample_100000_table.RDS")
-        predict_word(ngram_table, f())
+        #Produce table of possible predictions
+        predict_word(ngram_table, words())
         
     })
     
     output$phrase <- renderText({
+        
+        paste(input$txt, "...")
+    })
+    
+    output$word_options <- renderDataTable({
+
+        freqs()
+        
+    })
+    
+    output$table <- renderDataTable({
+        
+        "~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        
+    })
+    
+    output$predicted_word <- renderText({
+        
         #Select word with highest frequency
-        words <- f()
-        words
+        pred_word <- freqs()
+        paste("...",pred_word[1,1] %>% pull())
         
     })
 
 })
-
-#words <- readline(prompt = "Enter phrase")
-#words <- "Hello world"

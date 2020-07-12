@@ -86,3 +86,48 @@ n <- NROW(datatables_min)
 datatables_min8 <- datatables_min[72100001:n]
 saveRDS(datatables_min8, "./Word_Prediction/data/datatables_min8.RDS")
 rm(datatables_min8)
+
+#####################################
+datatables_min4 <- readRDS("./Word_Prediction/data/datatables_min4.RDS")
+write_csv(datatables_min4, "./Word_Prediction/data/datatables_min4.csv")
+
+
+##############################
+l <- list()
+
+datatables_min1 <- readRDS("./Word_Prediction/data/datatables_min1.RDS")
+l[[1]] <- datatables_min1
+rm(datatables_min1)
+
+datatables_min2 <- readRDS("./Word_Prediction/data/datatables_min2.RDS")
+l[[2]] <- datatables_min2
+rm(datatables_min2)
+
+datatables_min3 <- readRDS("./Word_Prediction/data/datatables_min3.RDS")
+l[[3]] <- datatables_min3
+rm(datatables_min3)
+
+datatables_min4 <- readRDS("./Word_Prediction/data/datatables_min4.RDS")
+l[[4]] <- datatables_min4
+rm(datatables_min4)
+
+datatables_min5 <- readRDS("./Word_Prediction/data/datatables_min5.RDS")
+l[[5]] <- datatables_min5
+rm(datatables_min5)
+
+datatables_min6 <- readRDS("./Word_Prediction/data/datatables_min6.RDS")
+l[[6]] <- datatables_min6
+rm(datatables_min6)
+
+datatables_min7 <- readRDS("./Word_Prediction/data/datatables_min7.RDS")
+l[[7]] <- datatables_min7
+rm(datatables_min7)
+
+datatables_min8 <- readRDS("./Word_Prediction/data/datatables_min8.RDS")
+l[[8]] <- datatables_min8
+rm(datatables_min8)
+
+ngram_table <- rbindlist(l)
+saveRDS(rbindlist, "./Word_Prediction/data/ngram_table.RDS")
+write_csv(rbindlist, "./Word_Prediction/data/ngram_table.RDS")
+

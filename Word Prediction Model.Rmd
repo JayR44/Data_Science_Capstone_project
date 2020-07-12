@@ -23,7 +23,10 @@ source("Functions.R")
 
 
 ```{r}
-input <- "Welcome to my wonderful hadn't to world"
+input <- "what a wonderful world it"
+```
+```{r}
+str_count(input, " ")
 ```
 
 ```{r}
@@ -40,7 +43,7 @@ phrase <- input %>%
   str_replace_all("hadn't", "had not") %>%
   removePunctuation()
 
-m <- wordcount(phrase); m
+m <- str_count(phrase, " "); m
 q <- min(m, 5)
 phrase_input <- paste(word(phrase,-q:-1), collapse = " "); phrase
 phrase_input
@@ -51,11 +54,9 @@ phrase_input
 ```
 
 ```{r}
-predict_word(ngram_table, phrase_input) #%>%
-  #filter(pred %in% c("case", "matter", "incident", "account"))
+x <- predict_word(ngram_table, phrase_input)
+x
 ```
-
-
 
 ```{r}
 phrase <- phrase_input
