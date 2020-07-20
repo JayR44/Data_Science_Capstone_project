@@ -8,7 +8,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, include = FALSE}
 library(tidyverse)
 library(quanteda)
 library(tm)
@@ -16,11 +16,21 @@ library(data.table)
 library(textclean)
 library(ngram)
 library(tictoc)
-library(hash)
+library(ff)
+library(ffbase)
+#library(sqldf)
 ```
 
 ```{r}
 source("./Word_Prediction/Functions.R")
+```
+
+```{r}
+filepath <- "./Word_Prediction/datatables_min.csv"
+classes <- c("character", "character", "numeric")
+
+gc(
+test <- fread(filepath, header = TRUE, sep = ",", stringsAsFactors = FALSE, nrow = 1, colClasses = classes))
 ```
 
 
@@ -50,8 +60,13 @@ phrase_input
 ```
 
 ```{r}
-#ngram_table <- readRDS("./sample_100000_table.RDS")
-# nrows = 81802659
+ ngram_table <- read.table.ffdf(file = "./Word_Prediction/datatables_min.csv", sep = ",",
+                                  header = TRUE, nrows = 1000, #0000,
+                                 # first.row = 10, next.rows = 1000000,
+                                  colClasses = c("factor", "factor", "numeric"))
+```
+
+```{r}
 tic("csv")
 #ngram_table <- data.table::fread("./Word_Prediction/data/datatables_min.csv")  #, header = T,colClasses = c("character","character", "numeric"))
 toc()
@@ -88,10 +103,9 @@ phrase_input
 ```
 
 ```{r}
-x <- predict_word(table1, table2, table3, table4, phrase_input)
+x <- predict_word(ngram_table, phrase_input)
 x
 ```
-
 
 ```{r}
 gc()
@@ -187,4 +201,90 @@ sub_lines <- ngram_table[grep(paste0(" ", phrase,"$"), ngram_1)]
 sub_lines
 ```
 
+##ffdf save and load
+
+```{r}
+ngram_ffdf <- read.table.ffdf(file = "./Word_Prediction/datatables_min.csv", sep = ",",
+                                  header = TRUE, nrows = 20000000,
+                                  first.row = 1000000, next.rows = 1000000,
+                                  colClasses = c("factor", "factor", "numeric"))
+
+save.ffdf(ngram_ffdf, dir = "./Word_Prediction/ffdb")
+```
+
+
+```{r}
+#save.ffdf(ngram_ffdf, dir = "./Word_Prediction/ffdb")
+```
+
+```{r}
+rm(ngram_ffdf
+```
+```{r}
+load.ffdf("./Word_Prediction/ffdb")
+```
+
+
+```{r}
+ system.time(ngram_table <- read.table.ffdf(file = "./Word_Prediction/datatables_min.csv", sep = ",",
+                                  header = TRUE, nrows = 1000000,
+                                  first.row = 1000, next.rows = 100000,
+                                  colClasses = c("factor", "factor", "numeric")))
+```
+
+```{r}
+ngram_dt <- readRDS("./useful files/datatables_min.RDS")
+```
+
+```{r}
+head(ngram_dt)
+```
+
+```{r}
+ngram_dt2 <- ngram_dt %>% mutate_at(vars("pred", "ngram_1"), as.factor)
+```
+
+```{r}
+saveRDS(ngram_dt2,"./useful files/ngram_dt_min_as_factors")
+```
+
+
+```{r}
+ngram_sub <- ngram_dt[1:1000]
+ngram_sub2 <- ngram_sub %>% mutate_at(vars("pred", "ngram_1"), as.factor)
+```
+
+```{r}
+ngram_ffdf <- as.ffdf(ngram_dt2)
+```
+
+```{r}
+save.ffdf(ngram_ffdf, dir = "./Word_Prediction/data")
+```
+
+```{r}
+rm(ngram_ffdf)
+```
+
+
+```{r}
+load.ffdf("./Word_Prediction/data")
+```
+
+```{r}
+tab1 <- ngram_ffdf[1:10000,]
+tab2 <- ngram_ffdf[20000:30000,]
+```
+
+```{r}
+tab1ff <- as.ffdf(tab1)
+```
+
+```{r}
+tab2ff <- as.ffdf(tab2)
+```
+
+```{r}
+ffdfbind <- rbind(tab1ff, tab2ff)
+```
 
